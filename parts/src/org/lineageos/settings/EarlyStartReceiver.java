@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The LineageOS Project
+ * Copyright (C) 2020 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,29 +19,18 @@ package org.lineageos.settings;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.PowerManager;
+import android.os.Parcel;
+import android.os.RemoteException;
+import android.os.ServiceManager;
 
-import org.lineageos.settings.PowerSaveModeChangeReceiver;
-import org.lineageos.settings.dirac.DiracUtils;
-import org.lineageos.settings.thermal.ThermalUtils;
 import org.lineageos.settings.utils.RefreshRateUtils;
 
-public class BootCompletedReceiver extends BroadcastReceiver {
+public class EarlyStartReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-        // Refresh rate
-        RefreshRateUtils.setFPS(RefreshRateUtils.getRefreshRate(context));
-        IntentFilter filter = new IntentFilter();
-        PowerSaveModeChangeReceiver receiver = new PowerSaveModeChangeReceiver();
-        filter.addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED);
-        context.getApplicationContext().registerReceiver(receiver, filter);
-
-        // Dirac
-        DiracUtils.initialize(context);
-
-        // Thermal Profiles
-        ThermalUtils.startService(context);
+        // Set FPS to 120hz on lock screen so that screen isn't laggy until .BootCompletedReceiver kicks in
+        // Note that we do not have data access at this time (direct boot)
+        RefreshRateUtils.setFPS(4);
     }
 }
